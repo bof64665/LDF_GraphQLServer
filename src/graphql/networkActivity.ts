@@ -45,4 +45,6 @@ export const mockNetworkActivities: NetworkActivity[] = [
     {id: 'network08', timestamp: DateTime.now().minus({minutes: 3}).toMillis(), target: 'port3', source: 'port1', protocol: 'tcp', length: 321},
     {id: 'network09', timestamp: DateTime.now().minus({minutes: 2}).toMillis(), target: 'port1', source: 'port3', protocol: 'tcp', length: 321},
     {id: 'network10', timestamp: DateTime.now().minus({minutes: 1}).toMillis(), target: 'port3', source: 'port1', protocol: 'tcp', length: 321},
+    {id: 'network11', timestamp: DateTime.now().minus({seconds: 45}).toMillis(), target: 'port5', source: 'port1', protocol: 'tcp', length: 321},
+    {id: 'network12', timestamp: DateTime.now().minus({seconds: 30}).toMillis(), target: 'port5', source: 'port1', protocol: 'tcp', length: 321},
 ];
