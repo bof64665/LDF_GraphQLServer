@@ -55,6 +55,12 @@ export class AnalysisDataResolver {
         const analysisData: AnalysisData = new AnalysisData(startTime, endTime);
         const dbConnection = new MongoConnector();
 
+/*         const tempFileVersions = new Map<string, {}>();
+        mongoDbFileVersion.forEach((version: any) => {
+            tempFileVersions.set(version.id, version)
+        });
+        Array.from(tempFileVersions); //[[key1, value1], [key2, value2]] */
+
         // TODO: fill data arrays with real data from DB
         analysisData.endpoints = mockEndpoints;
         analysisData.ports = mockPorts;
