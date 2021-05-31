@@ -1,4 +1,5 @@
 import { ObjectType, Field, Query, Resolver } from "type-graphql";
+import { MongoConnector } from "../mongodb/connector";
 
 @ObjectType({description: ""})
 class DataAvailability {

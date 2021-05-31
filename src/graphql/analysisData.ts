@@ -54,6 +54,10 @@ export class AnalysisDataResolver {
     async analysisData(@Args() {startTime, endTime}: GetAnalysisDataArgs) {
         const analysisData: AnalysisData = new AnalysisData(startTime, endTime);
         const dbConnection = new MongoConnector();
+        await dbConnection.connect();
+
+        const test = await dbConnection.networkActivityModel.find({});
+        console.log(test);
 
 /*         const tempFileVersions = new Map<string, {}>();
         mongoDbFileVersion.forEach((version: any) => {
