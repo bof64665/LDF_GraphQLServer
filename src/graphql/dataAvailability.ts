@@ -19,6 +19,15 @@ class DataAvailability {
 export class DataAvailabilityResolver {
     @Query(returns => DataAvailability)
     async dataAvailability() {
-        return new DataAvailability(Date.now() - 360000, Date.now());
+        const dbConnection = new MongoConnector();
+        await dbConnection.connect();
+        
+        let networkActivities = await dbConnection.networkActivityModel.find({});
+        networkActivities = networkActivities.map((networkActivity: any) => networkActivity.timestamp);
+        const minTimestamp = Math.min(...networkActivities);
+        const maxTimestamp = Math.max(...networkActivities);
+
+        dbConnection.closeConnection();
+        return new DataAvailability(minTimestamp, maxTimestamp);
     }
 }
