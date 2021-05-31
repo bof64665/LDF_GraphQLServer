@@ -11,7 +11,7 @@ class DbConnector:
         capturingDb = self.mongoClient.CapturingDB
         logging.debug('Connected to CapturingDB!')
         self.networkCapturing = capturingDb['network']
-        self.networkPreprocessed = capturingDb['network_preprocessed']
+        self.networkPreprocessed = capturingDb['NetworkActivity']
         self.psCapturing = capturingDb['ps']
         self.psPreprocessed = capturingDb['ps_preprocessed']
         
