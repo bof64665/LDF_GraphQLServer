@@ -1,7 +1,7 @@
 import { Document, ObjectId, Schema } from "mongoose";
 
 export interface INetworkActivity extends Document{
-    _id: ObjectId;
+    _id: string;
     timestamp: number;
     src_ip: string;
     dst_ip: string;
