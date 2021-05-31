@@ -3,7 +3,7 @@ import pymongo as pym
 import logging
 from datetime import datetime
 
-class LdfDbConnector:
+class DbConnector:
     def __init__(self):
         self.mongoClient = pym.MongoClient('85.25.195.221', 27017)
         self.mongoClient.db.authenticate('mongoadmin', 'MisterSmith117', source='admin')
@@ -13,7 +13,7 @@ class LdfDbConnector:
         self.networkCapturing = capturingDb['network']
         self.networkPreprocessed = capturingDb['network_preprocessed']
         self.psCapturing = capturingDb['ps']
-        self.psPreprocessed = capturingDb['ps_decoded']
+        self.psPreprocessed = capturingDb['ps_preprocessed']
         
     def closeConnection(self):
         logging.debug('Closing connection to MongoDB...')
@@ -25,10 +25,10 @@ class NetworkPreprocessor:
         self.db_network = db_network
         try:
             self.last_processed_id = last_processed_id = self.db_networkPreprocessed.find().sort('_id', -1).limit(1).next()['_id']
-            logging.debug('Continuing preprocessing after document_id `' + str(last_processed_id) + '`...')
+            logging.debug('Continuing network data preprocessing after document_id `' + str(last_processed_id) + '`...')
         except StopIteration:
             self.last_processed_id = 0
-            logging.debug('Starting new pre-processing run...')
+            logging.debug('Starting new network data pre-processing run...')
     
     def select_tcp(self, pcap, target):
         try:
@@ -51,7 +51,7 @@ class NetworkPreprocessor:
             return target
     
     def insert_processed_doc_into_db(self, doc):
-        timestamp = datetime.fromtimestamp(doc['time']/1000.0)
+        timestamp = datetime.fromtimestamp(doc['timestamp']/1000.0)
         if not self.db_networkPreprocessed.find_one({'_id': doc['_id']}):
             logging.debug('Inserting `' + str(doc['_id'])  + '` (' + str(timestamp) + ') ...')
             self.db_networkPreprocessed.insert_one(doc)
@@ -84,7 +84,7 @@ class NetworkPreprocessor:
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s (%(levelname)s): %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p', level=logging.DEBUG)
-    db = LdfDbConnector()
+    db = DbConnector()
     network_preprocessor = NetworkPreprocessor(db_network=db.networkCapturing, db_networkPreprocessed=db.networkPreprocessed)
     network_preprocessor.network_preprocessing()
     db.closeConnection()
