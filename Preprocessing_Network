@@ -1,0 +1,94 @@
+# -*- coding: utf-8 -*-
+import pymongo as pym
+import logging
+
+class LdfDbConnector:
+    def __init__(self):
+        self.mongoClient = pym.MongoClient('85.25.195.221', 27017)
+        self.mongoClient.db.authenticate('mongoadmin', 'MisterSmith117', source='admin')
+        
+    
+        capturingDb = self.mongoClient.CapturingDB
+        logging.debug('Connected to CapturingDB!')
+        self.networkCapturing = capturingDb['network']
+        self.networkPreprocessed = capturingDb['network_preprocessed']
+        self.psCapturing = capturingDb['ps']
+        self.psPreprocessed = capturingDb['ps_decoded']
+        
+    def closeConnection(self):
+        logging.debug('Closing connection to MongoDB...')
+        self.mongoClient.close()
+
+_____________________________________________________________________________________________
+
+
+# -*- coding: utf-8 -*-
+import logging
+import ldf_db_connector as db_connector
+from datetime import datetime
+
+def select_tcp(pcap, target):
+    try:
+        target['tcp_srcport'] = pcap['_source']['layers']['tcp']['tcp.srcport']
+        target['tcp_dstport'] = pcap['_source']['layers']['tcp']['tcp.dstport']
+        target['tcp_len'] = pcap['_source']['layers']['tcp']['tcp.len']
+        return target
+    except KeyError:
+        return target
+
+def select_udp(pcap, target):
+    try:
+        target['udp_srcport'] = pcap['_source']['layers']['udp']['udp.srcport']
+        target['udp_dstport'] = pcap['_source']['layers']['udp']['udp.dstport']
+        target['udp_len'] = pcap['_source']['layers']['udp']['udp.length']
+        return target
+    except KeyError:
+        return target
+
+def insert_target_doc(target_doc):
+    timestamp = datetime.fromtimestamp(target_doc['time']/1000.0)
+    if not db.networkPreprocessed.find_one({'_id': target_doc['_id']}):
+        logging.debug('Inserting `' + str(target_doc['_id'])  + '` (' + str(timestamp) + ') ...')
+        db.networkPreprocessed.insert_one(target_doc)
+    else:
+        logging.debug('Skipping `' + str(target_doc['_id']) + '`!')
+    
+def data_preprocessing():
+    try:
+        last_processed_id = db.networkPreprocessed.find().sort('_id', -1).limit(1).next()['_id']
+        logging.debug('Continuing preprocessing after document_id `' + str(last_processed_id) + '`...')
+        for pcap_doc in db.networkCapturing.find({'_id': {'$gt': last_processed_id}}).batch_size(1000): 
+            try:   
+                target_doc = {}
+                target_doc['_id'] = pcap_doc['_id']
+                target_doc['time'] = int(float(pcap_doc['_source']['layers']['frame']['frame.time_epoch'])*1000)
+                target_doc['ip_src'] = pcap_doc['_source']['layers']['ip']['ip.src']
+                target_doc['ip_dst'] = pcap_doc['_source']['layers']['ip']['ip.dst']
+                select_tcp(pcap_doc, target_doc)
+                select_udp(pcap_doc, target_doc)
+                insert_target_doc(target_doc)
+            except KeyError:
+                continue
+        logging.debug('Finished data preprocessing.')
+    except StopIteration:
+        logging.debug('Starting new pre-processing run...')
+        for pcap_doc in db.networkCapturing.find().batch_size(1000): 
+            try:   
+                target_doc = {}
+                target_doc['_id'] = pcap_doc['_id']
+                target_doc['time'] = int(float(pcap_doc['_source']['layers']['frame']['frame.time_epoch'])*1000)
+                target_doc['ip_src'] = pcap_doc['_source']['layers']['ip']['ip.src']
+                target_doc['ip_dst'] = pcap_doc['_source']['layers']['ip']['ip.dst']
+                select_tcp(pcap_doc, target_doc)
+                select_udp(pcap_doc, target_doc)
+                insert_target_doc(target_doc)
+            except KeyError:
+                continue
+    
+    
+
+if __name__ == "__main__":
+    logging.basicConfig(format='%(asctime)s (%(levelname)s): %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p', level=logging.DEBUG)
+    db = db_connector.LdfDbConnector()
+    data_preprocessing()
+    db.closeConnection()
