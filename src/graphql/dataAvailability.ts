@@ -1,5 +1,8 @@
 import { ObjectType, Field, Query, Resolver } from "type-graphql";
-import { MongoConnector } from "../mongodb/connector";
+import Container from "typedi";
+import { CdpApiConnector } from "../cdp_api/apiConnector";
+import { MongoConnector } from "../mongodb/mongoConnector";
+const axios = require('axios').default;
 
 @ObjectType({description: ""})
 class DataAvailability {
@@ -19,15 +22,20 @@ class DataAvailability {
 export class DataAvailabilityResolver {
     @Query(returns => DataAvailability)
     async dataAvailability() {
-        const dbConnection = new MongoConnector();
-        await dbConnection.connect();
-        
-        let networkActivities = await dbConnection.networkActivityModel.find({});
-        networkActivities = networkActivities.map((networkActivity: any) => networkActivity.timestamp);
-        const minTimestamp = Math.min(...networkActivities);
-        const maxTimestamp = Math.max(...networkActivities);
+        const dbConnection = Container.get(MongoConnector);
+        const apiConnection = Container.get(CdpApiConnector);
 
-        dbConnection.closeConnection();
+        let fileVersionTimestamps = (await apiConnection.getFileVersions(true)).timestamps;
+
+        const networkActivityTimestamps = new Set<number>();
+        let networkActivities = await dbConnection.getNetworkActivities();
+        networkActivities.forEach((networkActivity: any) => networkActivityTimestamps.add(networkActivity.timestamp));
+
+        const timestamps = [...fileVersionTimestamps, ...Array.from(networkActivityTimestamps)];
+        
+        const minTimestamp = Math.min(...timestamps);
+        const maxTimestamp = Math.max(...timestamps);
+
         return new DataAvailability(minTimestamp, maxTimestamp);
     }
 }

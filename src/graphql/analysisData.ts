@@ -1,5 +1,7 @@
 import { Args, ArgsType, Field, Int, ObjectType, Query, Resolver } from "type-graphql";
-import { MongoConnector } from "../mongodb/connector";
+import Container from "typedi";
+import { CdpApiConnector } from "../cdp_api/apiConnector";
+import { MongoConnector } from "../mongodb/mongoConnector";
 import { INetworkActivity } from "../mongodb/networkActivitySchema";
 import { EndPoint, mockEndpoints } from "./endPoint";
 import { File, mockFiles } from "./file";
@@ -54,17 +56,16 @@ export class AnalysisDataResolver {
     @Query( returns => AnalysisData)
     async analysisData(@Args() {startTime, endTime}: GetAnalysisDataArgs) {
         const analysisData: AnalysisData = new AnalysisData(startTime, endTime);
-        const dbConnection = new MongoConnector();
-        await dbConnection.connect();
+        const dbConnection = Container.get(MongoConnector);
+        const apiConnection = Container.get(CdpApiConnector);
 
         const tmpEndPoints = new Map<string, EndPoint>();
         const tmpPorts = new Map<string, Port>();
         const tmpNetworkActivity = new Map<string, NetworkActivity>();
 
         const localhost: string = '10.0.0.3';
-        tmpEndPoints.set('localhost', {id: 'localhost', hostIp: localhost, hostName: 'localhost'});
 
-        const networkActivities: INetworkActivity[] = await dbConnection.networkActivityModel.find({}); //TODO: Add timestamp filter to find()-Method
+        const networkActivities: INetworkActivity[] = await dbConnection.getNetworkActivities(startTime, endTime);
         networkActivities.forEach((na: INetworkActivity) => {
             const srcPortId = `${na.src_ip}:${na.src_port}`;
             const dstPortId = `${na.dst_ip}:${na.dst_port}`;
@@ -79,15 +80,16 @@ export class AnalysisDataResolver {
             if(!tmpPorts.has(dstPortId)) tmpPorts.set(dstPortId, {id: dstPortId, portNumber: parseInt(na.dst_port), hostName: na.dst_ip});
         });
 
-        // TODO: fill data arrays with real data from DB
+        const {timestamps, files, fileVersions} = await apiConnection.getFileVersions(false, startTime, endTime);
+
         analysisData.endpoints = Array.from(tmpEndPoints.values());
         analysisData.ports = Array.from(tmpPorts.values());
         analysisData.networkActivities = Array.from(tmpNetworkActivity.values());
+        analysisData.files = files;
+        analysisData.fileVersions = fileVersions;
+        // TODO: fill remaining data arrays with real data from DB
         analysisData.processes = mockProcesses;
-        analysisData.files = mockFiles;
-        analysisData.fileVersions = mockFileVersions;
 
-        dbConnection.closeConnection();
         return analysisData;
     }
 }

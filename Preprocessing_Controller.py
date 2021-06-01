@@ -6,7 +6,7 @@ from datetime import datetime
 class DbConnector:
     def __init__(self):
         self.mongoClient = pym.MongoClient('85.25.195.221', 27017)
-        self.mongoClient.db.authenticate('mongoadmin', 'MisterSmith117', source='admin')
+        self.mongoClient.db.authenticate('captureClient', 'Saturn22!!', source='CapturingDB')
         
         capturingDb = self.mongoClient.CapturingDB
         logging.debug('Connected to CapturingDB!')
