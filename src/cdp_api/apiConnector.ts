@@ -1,13 +1,18 @@
-import { Service } from "typedi";
+import { Service, Container } from "typedi";
 import { FileVersion } from "../graphql/fileVersion";
 import { File } from "../graphql/file";
 import axios from 'axios';
+import { MongoConnector } from "../mongodb/mongoConnector";
+import { IFsmon } from "../mongodb/fsmonSchema";
 
 @Service()
 export class CdpApiConnector {
     private fileVersions: Map<string, FileVersion> = new Map<string, FileVersion>();
     private files: Map<string, File> = new Map<string, File>();
     private timestamps: Set<number> = new Set<number>();
+
+    private dbConnection = Container.get(MongoConnector);
+    private fsmon: IFsmon[] = [];
 
     /**
      * 
@@ -18,14 +23,18 @@ export class CdpApiConnector {
      */
     public async getFileVersions(onlyTimestamps: boolean, startTime?: number, endTime?: number): Promise<{timestamps: number[], files: File[], fileVersions: FileVersion[]}> {
         const searchParams: {regex: string, startDate?: number, endDate?: number} = {regex: ''};
+        
         if(startTime && endTime) {
             searchParams.startDate = Math.floor(startTime / 1000);
             searchParams.endDate = Math.floor(endTime / 1000);
+            this.fsmon =  await this.dbConnection.getFsmon(startTime, endTime);
         }
         const apiResponse = await axios.get('http://85.25.195.221:8080/restoreList/iPhone11_iOS_14.5_dji-fly_1.3.1(440)', {
             params: searchParams
         });
+        console.log('Succesfully queried API...');
         this.parseItemList(apiResponse.data, onlyTimestamps);
+        console.log(`Retrieved ${this.fileVersions.size} file versions!`);
         return {
             timestamps: Array.from(this.timestamps),
             files: Array.from(this.files.values()),
@@ -63,10 +72,11 @@ export class CdpApiConnector {
     }
 
     private parseFileVersion(item: any, file: File): void {
+        const fsmonElement = this.fsmon.find((d: IFsmon) => (d.name === file.path) && (d.mtime === item.mtime));
         const fileVersion: FileVersion = new FileVersion(
             item.mtime * 1000,
             file.id,
-            'dummyProcess',
+            fsmonElement ? fsmonElement.pid.toString() : 'n/a',
             item.fsize,
             'tbd'
         );

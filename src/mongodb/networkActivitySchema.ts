@@ -1,4 +1,4 @@
-import { Document, ObjectId, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 
 export interface INetworkActivity extends Document{
     _id: string;

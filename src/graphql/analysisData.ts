@@ -3,11 +3,11 @@ import Container from "typedi";
 import { CdpApiConnector } from "../cdp_api/apiConnector";
 import { MongoConnector } from "../mongodb/mongoConnector";
 import { INetworkActivity } from "../mongodb/networkActivitySchema";
-import { EndPoint, mockEndpoints } from "./endPoint";
-import { File, mockFiles } from "./file";
-import { FileVersion, mockFileVersions } from "./fileVersion";
-import { mockNetworkActivities, NetworkActivity } from "./networkActivity";
-import { mockPorts, Port } from "./port";
+import { EndPoint } from "./endPoint";
+import { File } from "./file";
+import { FileVersion } from "./fileVersion";
+import { NetworkActivity } from "./networkActivity";
+import { Port } from "./port";
 import { mockProcesses, Process } from "./process";
 
 @ObjectType({description: ""})

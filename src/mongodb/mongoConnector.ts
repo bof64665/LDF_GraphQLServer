@@ -1,5 +1,6 @@
 import { Model, Mongoose } from "mongoose";
 import { Service } from "typedi";
+import { fsmonSchema, IFsmon } from "./fsmonSchema";
 import { INetworkActivity, networkActivitySchema } from "./networkActivitySchema";
 
 @Service()
@@ -21,6 +22,7 @@ export class MongoConnector {
 
     private mongoDbConnection: Mongoose = new Mongoose();
     private networkActivityModel: undefined | Model<INetworkActivity> = undefined;
+    private fsmonModel: undefined | Model<IFsmon> = undefined;
 
     constructor() {
         this.mongoDbConnection.connect(
@@ -30,6 +32,8 @@ export class MongoConnector {
         );
         this.networkActivityModel = 
             this.mongoDbConnection.model<INetworkActivity>('NetworkActivity', networkActivitySchema, 'NetworkActivity');
+        this.fsmonModel =
+            this.mongoDbConnection.model<IFsmon>('Fsmon', fsmonSchema, 'fsmon_pid_to_file');
     }
 
 
@@ -42,7 +46,19 @@ export class MongoConnector {
             ]};
         }
         const activities: INetworkActivity[] = this.networkActivityModel ? await this.networkActivityModel.find(searchParams) : [];
-        console.log(`Retreived ${activities.length} network activities!`);
+        console.log(`Retrieved ${activities.length} network activities!`);
         return activities;
+    }
+
+    public async getFsmon(startTime: number, endTime: number): Promise<IFsmon[]> {
+        const searchParams = {
+            $and: [
+                { timestamp: { $gte: startTime } }, 
+                { timestamp: {$lte: endTime } }
+            ]
+        };
+        const fsmon: IFsmon[] = this.fsmonModel ? await this.fsmonModel.find(searchParams) : [];
+        console.log(`Retrieved ${fsmon.length} fsmon data!`);
+        return fsmon;
     }
 }
