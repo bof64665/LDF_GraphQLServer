@@ -29,7 +29,7 @@ export class CdpApiConnector {
             searchParams.endDate = Math.floor(endTime / 1000);
             this.fsmon =  await this.dbConnection.getFsmon(startTime, endTime);
         }
-        const apiResponse = await axios.get('http://85.25.195.221:8080/restoreList/iPhone11_iOS_14.5_dji-fly_1.3.1(440)', {
+        const apiResponse = await axios.get('http://85.25.195.221:8080/restoreList/iPhone11_iOS_14.5_VIZ1.0', {
             params: searchParams
         });
         console.log('Succesfully queried API...');
@@ -72,6 +72,7 @@ export class CdpApiConnector {
     }
 
     private parseFileVersion(item: any, file: File): void {
+        // console.log(this.fsmon);
         const fsmonElement = this.fsmon.find((d: IFsmon) => (d.name === file.path) && (d.mtime === item.mtime));
         const fileVersion: FileVersion = new FileVersion(
             item.mtime * 1000,

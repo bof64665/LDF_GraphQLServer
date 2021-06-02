@@ -53,8 +53,8 @@ export class MongoConnector {
     public async getFsmon(startTime: number, endTime: number): Promise<IFsmon[]> {
         const searchParams = {
             $and: [
-                { timestamp: { $gte: startTime } }, 
-                { timestamp: {$lte: endTime } }
+                { mtime: { $gte: Math.floor(startTime / 1000) } }, 
+                { mtime: { $lte: Math.floor(endTime / 1000) } }
             ]
         };
         const fsmon: IFsmon[] = this.fsmonModel ? await this.fsmonModel.find(searchParams) : [];
