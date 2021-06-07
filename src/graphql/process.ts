@@ -9,16 +9,20 @@ export class Process {
     name: string;
 
     @Field(type => String)
-    hostName: string = 'localhost';
+    hostName: string = '10.0.0.3';
 
-    constructor(name: string) {
+    constructor(id: string, name: string) {
         this.name = name;
+        this.id = id;
     }
 }
 
 export const mockProcesses: Process[] = [
-    {id: 'process1', name: 'process 1', hostName: 'localhost'},
-    {id: 'process2', name: 'process 2', hostName: 'localhost'},
-    {id: 'process3', name: 'process 3', hostName: 'localhost'},
-    {id: 'process4', name: 'process 4', hostName: 'localhost'},
+    {id: '43526', name: 'process 1', hostName: '10.0.0.3'},
+    {id: '60', name: 'process 2', hostName: '10.0.0.3'},
+    {id: '225', name: 'process 3', hostName: '10.0.0.3'},
+    {id: '42401', name: 'process 4', hostName: '10.0.0.3'},
+    {id: '45', name: 'process 5', hostName: '10.0.0.3'},
+    {id: '30', name: 'process 6', hostName: '10.0.0.3'},
+    {id: '43530', name: 'process 7', hostName: '10.0.0.3'},
 ];

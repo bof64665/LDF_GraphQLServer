@@ -74,13 +74,29 @@ export class AnalysisDataResolver {
 
             const out: boolean = na.src_ip === localhost;
             const externalIp: string = out ? na.dst_ip : na.src_ip;
+            tmpEndPoints.set(localhost, {id: localhost, hostIp: localhost, hostName: localhost})
             if(!tmpEndPoints.has(externalIp)) tmpEndPoints.set(externalIp, {id: externalIp, hostIp: externalIp, hostName: externalIp});
 
             if(!tmpPorts.has(srcPortId)) tmpPorts.set(srcPortId, {id: srcPortId, portNumber: parseInt(na.src_port), hostName: na.src_ip});
             if(!tmpPorts.has(dstPortId)) tmpPorts.set(dstPortId, {id: dstPortId, portNumber: parseInt(na.dst_port), hostName: na.dst_ip});
+
         });
 
         const {timestamps, files, fileVersions} = await apiConnection.getFileVersions(false, startTime, endTime);
+
+        const ps: Map<string, Process> = await dbConnection.getPs();
+        const processes: Set<Process> = new Set<Process>();
+
+        const emptyProcess: Process = new Process('0', 'n/a')
+        fileVersions.forEach((version: FileVersion) => {
+            const process: Process | undefined = ps.get(version.source);
+            if(process) {
+                processes.add(process)
+            } else {
+                processes.add(emptyProcess)
+                version.source = '0';
+            }
+        });
 
         analysisData.endpoints = Array.from(tmpEndPoints.values());
         analysisData.ports = Array.from(tmpPorts.values());
@@ -88,7 +104,7 @@ export class AnalysisDataResolver {
         analysisData.files = files;
         analysisData.fileVersions = fileVersions;
         // TODO: fill remaining data arrays with real data from DB
-        analysisData.processes = mockProcesses;
+        analysisData.processes = Array.from(processes);
 
         return analysisData;
     }

@@ -1,7 +1,9 @@
 import { Model, Mongoose } from "mongoose";
 import { Service } from "typedi";
+import { Process } from "../graphql/process";
 import { fsmonSchema, IFsmon } from "./fsmonSchema";
 import { INetworkActivity, networkActivitySchema } from "./networkActivitySchema";
+import { Ps, psSchema } from "./psSchema";
 
 @Service()
 export class MongoConnector {
@@ -23,6 +25,7 @@ export class MongoConnector {
     private mongoDbConnection: Mongoose = new Mongoose();
     private networkActivityModel: undefined | Model<INetworkActivity> = undefined;
     private fsmonModel: undefined | Model<IFsmon> = undefined;
+    private psModel: undefined | Model<Ps> = undefined;
 
     constructor() {
         this.mongoDbConnection.connect(
@@ -34,6 +37,8 @@ export class MongoConnector {
             this.mongoDbConnection.model<INetworkActivity>('NetworkActivity', networkActivitySchema, 'NetworkActivity');
         this.fsmonModel =
             this.mongoDbConnection.model<IFsmon>('Fsmon', fsmonSchema, 'fsmon_pid_to_file');
+        this.psModel =
+            this.mongoDbConnection.model<Ps>('Ps', psSchema, 'ps_dec_neu');
     }
 
 
@@ -60,5 +65,16 @@ export class MongoConnector {
         const fsmon: IFsmon[] = this.fsmonModel ? await this.fsmonModel.find(searchParams) : [];
         console.log(`Retrieved ${fsmon.length} fsmon data!`);
         return fsmon;
+    }
+
+    public async getPs(): Promise<Map<string, Process>> {
+        const psMap: Map<string, Process> = new Map<string, Process>();
+        const ps: Ps[] = this.psModel ? await this.psModel.find() : [];
+        ps.forEach((ps: Ps) => {
+            ps.PID.forEach((pid: string, index: number) => {
+                psMap.set(pid, new Process(pid, ps.COMMAND[index].substr(0, ps.COMMAND[index].length - 1)));
+            })
+        })
+        return psMap;
     }
 }

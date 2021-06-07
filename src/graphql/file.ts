@@ -15,7 +15,7 @@ export class File {
     type: string;
 
     @Field(type => String)
-    hostName: string = 'localhost'
+    hostName: string = '10.0.0.3'
 
     constructor(path: string, name: string, type: string) {
         this.path = path;
