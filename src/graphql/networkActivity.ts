@@ -34,6 +34,36 @@ export class NetworkActivity {
     }
 }
 
+@ObjectType({description: ""})
+export class NetworkActivityLink {
+    @Field(type => ID)
+    id: string;
+
+    @Field(type => String)
+    source: string;
+
+    @Field(type => String)
+    target: string;
+
+    @Field(type => Number)
+    overallLinkBytes: number;
+
+    @Field(type => Number)
+    byteProportion: number;
+
+    @Field(ttype => [NetworkActivity])
+    activities: NetworkActivity[];
+
+    constructor(id: string, source: string, target: string, overallLinkBytes: number, byteProportion: number, activities: NetworkActivity[]) {
+        this.id = id;
+        this.source = source;
+        this.target = target;
+        this.overallLinkBytes = overallLinkBytes;
+        this.byteProportion = byteProportion;
+        this.activities = activities;
+    }
+}
+
 export const mockNetworkActivities: NetworkActivity[] = [
     {id: 'network01', timestamp: DateTime.now().minus({minutes: 3}).toMillis(), target: 'port1', source: 'port5', protocol: 'tcp', length: 321},
     {id: 'network02', timestamp: DateTime.now().minus({minutes: 3}).toMillis(), target: 'port1', source: 'port5', protocol: 'tcp', length: 321},

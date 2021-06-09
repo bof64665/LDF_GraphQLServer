@@ -33,6 +33,37 @@ export class FileVersion {
     }
 }
 
+@ObjectType({description: ""})
+export class FileVersionLink {
+    @Field(type => ID)
+    id: string;
+
+    @Field(type => String)
+    source: string;
+
+    @Field(type => String)
+    target: string;
+
+    @Field(type => Number)
+    overallLinkBytes: number;
+
+    @Field(type => Number)
+    byteProportion: number;
+
+    @Field(ttype => [FileVersion])
+    versions: FileVersion[];
+
+    constructor(id: string, source: string, target: string, overallLinkBytes: number, byteProportion: number, versions: FileVersion[]) {
+        this.id = id;
+        this.source = source;
+        this.target = target;
+        this.overallLinkBytes = overallLinkBytes;
+        this.byteProportion = byteProportion;
+        this.versions = versions;
+    }
+}
+
+
 export const mockFileVersions: FileVersion[] = [
     {id: 'version1', timestamp: DateTime.now().minus({minutes: 2}).toMillis(), target: 'file1', source: 'process2', fileSize: 123, action: 'FSE_CREATE_FILE'},
     {id: 'version2', timestamp: DateTime.now().minus({minutes: 3}).toMillis(), target: 'file2', source: 'process2', fileSize: 2, action: 'FSE_CREATE_FILE'},
