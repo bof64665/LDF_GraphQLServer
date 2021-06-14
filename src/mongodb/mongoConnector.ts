@@ -83,6 +83,7 @@ export class MongoConnector {
         return psMap;
     }
 
+    // TODO: Search parameters
     public async getSyslog(): Promise<ISyslog[]> {
         const syslog: ISyslog[] = this.syslogModel ? await this.syslogModel.find() : [];
         console.log(`Retrieved ${syslog.length} syslog data!`);

@@ -69,16 +69,13 @@ class GetAnalysisDataArgs {
     startTime: number = Date.now() - 60000;
 
     @Field()
-    endTime: number = Date.now();;
-
-    @Field()
-    aggregationGranularity: number = 86400000;
+    endTime: number = Date.now();
 }
 
 @Resolver(of => AnalysisData)
 export class AnalysisDataResolver {
     @Query( returns => AnalysisData)
-    async analysisData(@Args() {startTime, endTime, aggregationGranularity}: GetAnalysisDataArgs) {
+    async analysisData(@Args() {startTime, endTime}: GetAnalysisDataArgs) {
         const analysisData: AnalysisData = new AnalysisData(startTime, endTime);
         const dbConnection = Container.get(MongoConnector);
         const apiConnection = Container.get(CdpApiConnector);
@@ -137,19 +134,14 @@ export class AnalysisDataResolver {
             }
         });
 
-
-
         analysisData.endpoints = Array.from(tmpEndPoints.values());
         analysisData.ports = Array.from(tmpPorts.values());
         analysisData.networkActivities = Array.from(tmpNetworkActivity.values());
         analysisData.files = files;
         analysisData.fileVersions = tmpFileVersions;
-        // TODO: fill remaining data arrays with real data from DB
         analysisData.processes = Array.from(processes).map(d => d[1]);
 
-
-
-
+        const aggregationGranularity = (endTime - startTime) / 100;
         const dataBuckets: Map<number, DataBucket> = new Map<number, DataBucket>();
         let bucketStartDateTime = startTime;
 
