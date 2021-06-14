@@ -4,6 +4,7 @@ import { Process } from "../graphql/process";
 import { fsmonSchema, IFsmon } from "./fsmonSchema";
 import { INetworkActivity, networkActivitySchema } from "./networkActivitySchema";
 import { Ps, psSchema } from "./psSchema";
+import { ISyslog, syslogSchema } from "./syslogSchema";
 
 @Service()
 export class MongoConnector {
@@ -26,6 +27,7 @@ export class MongoConnector {
     private networkActivityModel: undefined | Model<INetworkActivity> = undefined;
     private fsmonModel: undefined | Model<IFsmon> = undefined;
     private psModel: undefined | Model<Ps> = undefined;
+    private syslogModel: undefined | Model<ISyslog> = undefined;
 
     constructor() {
         this.mongoDbConnection.connect(
@@ -39,6 +41,8 @@ export class MongoConnector {
             this.mongoDbConnection.model<IFsmon>('Fsmon', fsmonSchema, 'fsmon_pid_to_file');
         this.psModel =
             this.mongoDbConnection.model<Ps>('Ps', psSchema, 'ps_dec_neu');
+        this.syslogModel =
+            this.mongoDbConnection.model<ISyslog>('Syslog', syslogSchema, 'Syslog');
     }
 
 
@@ -77,5 +81,11 @@ export class MongoConnector {
             })
         })
         return psMap;
+    }
+
+    public async getSyslog(): Promise<ISyslog[]> {
+        const syslog: ISyslog[] = this.syslogModel ? await this.syslogModel.find() : [];
+        console.log(`Retrieved ${syslog.length} syslog data!`);
+        return syslog;
     }
 }

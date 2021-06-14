@@ -4,6 +4,7 @@ import Container from "typedi";
 import { CdpApiConnector } from "../cdp_api/apiConnector";
 import { MongoConnector } from "../mongodb/mongoConnector";
 import { INetworkActivity } from "../mongodb/networkActivitySchema";
+import { ISyslog } from "../mongodb/syslogSchema";
 import { DataBucket } from "./dataBucket";
 import { EndPoint } from "./endPoint";
 import { File } from "./file";
@@ -106,18 +107,37 @@ export class AnalysisDataResolver {
         const {timestamps, files, fileVersions: tmpFileVersions} = await apiConnection.getFileVersions(false, startTime, endTime);
 
         const ps: Map<string, Process> = await dbConnection.getPs();
-        const processes: Set<Process> = new Set<Process>();
+        const syslog: ISyslog[] = await dbConnection.getSyslog();
+        const processes: Map<string, Process> = new Map<string, Process>();
+
+        syslog.forEach((log: ISyslog) => {
+            processes.set(log.pid, new Process(log.pid, log.pname));
+            const portId = `10.0.0.3:${log.port}`;
+            const port = tmpPorts.get(portId);
+            if (port) {
+                if(port.processes) {
+                    if (!port.processes.includes(log.pid)) port.processes.push(log.pid);
+                } else {
+                    port.processes = [log.pid]
+                }
+                tmpPorts.set(portId, port);
+            } else {
+                tmpPorts.set(portId, {id: portId, portNumber: parseInt(log.port), hostName: "10.0.0.3", processes: [log.pid]});
+            }
+        })
 
         const emptyProcess: Process = new Process('0', 'n/a')
         tmpFileVersions.forEach((version: FileVersion) => {
             const process: Process | undefined = ps.get(version.source);
             if(process) {
-                processes.add(process)
+                processes.set(process.id, process);
             } else {
-                processes.add(emptyProcess)
+                processes.set('0', emptyProcess);
                 version.source = '0';
             }
         });
+
+
 
         analysisData.endpoints = Array.from(tmpEndPoints.values());
         analysisData.ports = Array.from(tmpPorts.values());
@@ -125,7 +145,7 @@ export class AnalysisDataResolver {
         analysisData.files = files;
         analysisData.fileVersions = tmpFileVersions;
         // TODO: fill remaining data arrays with real data from DB
-        analysisData.processes = Array.from(processes);
+        analysisData.processes = Array.from(processes).map(d => d[1]);
 
 
 
