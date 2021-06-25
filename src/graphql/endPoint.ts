@@ -18,5 +18,8 @@ export class EndPoint {
 }
 
 export const mockEndpoints: EndPoint[] = [
-    {id: 'endpoint1', hostName: 'test', hostIp: '132.199.123.1'}
+    {id: '10.0.0.12', hostName: '10.0.0.12', hostIp: '10.0.0.12'},
+    {id: '132.199.123.1', hostName: '132.199.123.1', hostIp: '132.199.123.1'},
+    {id: '255.10.13.132', hostName: '278.10.13.132', hostIp: '278.10.13.132'},
+    {id: '92.99.231.23', hostName: '92.99.231.23', hostIp: '92.99.231.23'},
 ];

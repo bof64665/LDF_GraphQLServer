@@ -15,7 +15,7 @@ export class File {
     type: string;
 
     @Field(type => String)
-    hostName: string = '10.0.0.3'
+    hostName: string = '10.0.0.12'
 
     constructor(path: string, name: string, type: string) {
         this.path = path;
@@ -24,7 +24,9 @@ export class File {
     }
 }
 
-export const mockFiles: File[] = [
-    {id: 'file1', path: '/var/test/foo', name: 'bar.txt', type: 'txt', hostName: 'localhost'},
-    {id: 'file2', path: '/var/bar', name: 'foo.doc', type: 'doc', hostName: 'localhost'},
-];
+/* export const mockFiles: File[] = [
+    {id: '/var/test/foo', path: '/var/test/foo/bar.txt', name: 'bar.txt', type: '.txt', hostName: '10.0.0.12'},
+    {id: '/var/bar', path: '/var/bar/foo.doc', name: 'foo.doc', type: '.doc', hostName: '10.0.0.12'},
+    {id: '/var/bar/foo', path: '/var/bar/foobar_split1.zip', name: 'foobar_split1.zip', type: '.zip', hostName: '10.0.0.12'},
+    {id: '/var/bar', path: '/bar/foo/test/foobar_splt2.zip', name: 'foobar_split1.zip', type: '.zip', hostName: '10.0.0.12'},
+]; */

@@ -66,7 +66,8 @@ export class MongoConnector {
                 { mtime: { $lte: Math.floor(endTime / 1000) } }
             ]
         };
-        const fsmon: IFsmon[] = this.fsmonModel ? await this.fsmonModel.find(searchParams) : [];
+        /* const fsmon: IFsmon[] = this.fsmonModel ? await this.fsmonModel.find(searchParams) : []; */
+        const fsmon: IFsmon[] = this.fsmonModel ? await this.fsmonModel.find() : [];
         console.log(`Retrieved ${fsmon.length} fsmon data!`);
         return fsmon;
     }

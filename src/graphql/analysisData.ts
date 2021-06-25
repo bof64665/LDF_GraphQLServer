@@ -10,11 +10,12 @@ import { EndPoint } from "./endPoint";
 import { File } from "./file";
 import { FileVersion, FileVersionLink } from "./fileVersion";
 import { LookUpElement } from "./lookUpElement";
+import { mockEndpoints, mockFiles, getMockPorts, mockProcesses, mockFileVersions, getNetworkActivity, mockNetworkActivity } from "./mockData";
 import { NetworkActivity, NetworkActivityLink } from "./networkActivity";
 import { Port } from "./port";
-import { mockProcesses, Process } from "./process";
+import { Process } from "./process";
 
-const localhost: string = '10.0.0.3';
+const localhost: string = '10.0.0.12';
 
 @ObjectType({description: ""})
 export class AnalysisData {
@@ -79,13 +80,15 @@ export class AnalysisDataResolver {
         const analysisData: AnalysisData = new AnalysisData(startTime, endTime);
         const dbConnection = Container.get(MongoConnector);
         const apiConnection = Container.get(CdpApiConnector);
-
+/* 
         const tmpEndPoints = new Map<string, EndPoint>();
         const tmpPorts = new Map<string, Port>();
         const tmpNetworkActivity = new Map<string, NetworkActivity>();
 
         const dbNetworkActivities: INetworkActivity[] = await dbConnection.getNetworkActivities(startTime, endTime);
         dbNetworkActivities.forEach((na: INetworkActivity) => {
+            if(!na.protocol) return;
+
             const srcPortId = `${na.src_ip}:${na.src_port}`;
             const dstPortId = `${na.dst_ip}:${na.dst_port}`;
 
@@ -109,7 +112,7 @@ export class AnalysisDataResolver {
 
         syslog.forEach((log: ISyslog) => {
             processes.set(log.pid, new Process(log.pid, log.pname));
-            const portId = `10.0.0.3:${log.port}`;
+            const portId = `10.0.0.12:${log.port}`;
             const port = tmpPorts.get(portId);
             if (port) {
                 if(port.processes) {
@@ -119,27 +122,34 @@ export class AnalysisDataResolver {
                 }
                 tmpPorts.set(portId, port);
             } else {
-                tmpPorts.set(portId, {id: portId, portNumber: parseInt(log.port), hostName: "10.0.0.3", processes: [log.pid]});
+                tmpPorts.set(portId, {id: portId, portNumber: parseInt(log.port), hostName: "10.0.0.12", processes: [log.pid]});
             }
         })
 
-        const emptyProcess: Process = new Process('0', 'n/a')
+        const emptyProcess: Process = new Process('0', '0')
         tmpFileVersions.forEach((version: FileVersion) => {
             const process: Process | undefined = ps.get(version.source);
             if(process) {
                 processes.set(process.id, process);
             } else {
-                processes.set('0', emptyProcess);
-                version.source = '0';
+                version.source === '0' ?  processes.set('0', emptyProcess) : processes.set(version.source, new Process(version.source, version.source));
             }
-        });
+        }); */
 
-        analysisData.endpoints = Array.from(tmpEndPoints.values());
+        analysisData.endpoints = mockEndpoints;
+        analysisData.ports = getMockPorts();
+        getNetworkActivity();
+        analysisData.networkActivities = mockNetworkActivity;
+        analysisData.files = mockFiles;
+        analysisData.fileVersions = mockFileVersions;
+        analysisData.processes = mockProcesses;
+
+/*         analysisData.endpoints = Array.from(tmpEndPoints.values());
         analysisData.ports = Array.from(tmpPorts.values());
         analysisData.networkActivities = Array.from(tmpNetworkActivity.values());
         analysisData.files = files;
         analysisData.fileVersions = tmpFileVersions;
-        analysisData.processes = Array.from(processes).map(d => d[1]);
+        analysisData.processes = Array.from(processes).map(d => d[1]); */
 
         const aggregationGranularity = (endTime - startTime) / 100;
         const dataBuckets: Map<number, DataBucket> = new Map<number, DataBucket>();
@@ -156,7 +166,9 @@ export class AnalysisDataResolver {
         const networkActivityLinksLookUp = new Map<string, Set<number>>();
 
         let overallNetworkBytes: number = 0;
-        tmpNetworkActivity.forEach((activity: NetworkActivity, key: string) => {
+        mockNetworkActivity.forEach((activity: NetworkActivity, index: number) => {
+            if(!activity.protocol) return;
+
             const activityBucketHash: number = Math.floor(activity.timestamp / aggregationGranularity);
             const bucket = dataBuckets.get(activityBucketHash);
             if(!bucket) return;
@@ -205,7 +217,7 @@ export class AnalysisDataResolver {
         const fileVersionLinksLookUp = new Map<string, Set<number>>();
 
         let overallFileVersionBytes: number = 0;
-        tmpFileVersions.forEach((version: FileVersion) => {
+        mockFileVersions.forEach((version: FileVersion) => {
             const versionBucketHash = Math.floor(version.timestamp / aggregationGranularity);
             const bucket = dataBuckets.get(versionBucketHash);
             if(!bucket) return;

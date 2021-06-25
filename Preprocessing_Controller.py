@@ -125,7 +125,8 @@ class NetworkPreprocessor:
         target_doc['dst_ip'] = original_doc['_source']['layers']['ip']['ip.dst']
         self.__select_tcp(original_doc, target_doc)
         self.__select_udp(original_doc, target_doc)
-        self.__insert_processed_doc_into_db(target_doc)
+        if(target_doc['src_ip'] == '10.0.0.12' or target_doc['dst_ip'] == '10.0.0.12'):
+            self.__insert_processed_doc_into_db(target_doc)
         
     def __process_doc_list(self, doc_list):
         for pcap_doc in doc_list:

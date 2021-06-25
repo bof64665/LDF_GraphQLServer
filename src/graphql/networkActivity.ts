@@ -65,16 +65,16 @@ export class NetworkActivityLink {
 }
 
 export const mockNetworkActivities: NetworkActivity[] = [
-    {id: 'network01', timestamp: DateTime.now().minus({minutes: 3}).toMillis(), target: 'port1', source: 'port5', protocol: 'tcp', length: 321},
-    {id: 'network02', timestamp: DateTime.now().minus({minutes: 3}).toMillis(), target: 'port1', source: 'port5', protocol: 'tcp', length: 321},
-    {id: 'network03', timestamp: DateTime.now().minus({minutes: 2}).toMillis(), target: 'port1', source: 'port5', protocol: 'tcp', length: 321},
-    {id: 'network04', timestamp: DateTime.now().minus({minutes: 1}).toMillis(), target: 'port5', source: 'port1', protocol: 'tcp', length: 321},
-    {id: 'network05', timestamp: DateTime.now().minus({minutes: 4}).toMillis(), target: 'port2', source: 'port4', protocol: 'udp', length: 321},
-    {id: 'network06', timestamp: DateTime.now().minus({minutes: 2}).toMillis(), target: 'port4', source: 'port2', protocol: 'udp', length: 321},
-    {id: 'network07', timestamp: DateTime.now().minus({minutes: 4}).toMillis(), target: 'port1', source: 'port3', protocol: 'tcp', length: 321},
-    {id: 'network08', timestamp: DateTime.now().minus({minutes: 3}).toMillis(), target: 'port3', source: 'port1', protocol: 'tcp', length: 321},
-    {id: 'network09', timestamp: DateTime.now().minus({minutes: 2}).toMillis(), target: 'port1', source: 'port3', protocol: 'tcp', length: 321},
-    {id: 'network10', timestamp: DateTime.now().minus({minutes: 1}).toMillis(), target: 'port3', source: 'port1', protocol: 'tcp', length: 321},
-    {id: 'network11', timestamp: DateTime.now().minus({seconds: 45}).toMillis(), target: 'port5', source: 'port1', protocol: 'tcp', length: 321},
-    {id: 'network12', timestamp: DateTime.now().minus({seconds: 30}).toMillis(), target: 'port5', source: 'port1', protocol: 'tcp', length: 321},
+    {id: 'network01', timestamp: DateTime.now().minus({seconds: 64}).toMillis(), target: '10.0.0.12:447', source: '132.199.123.1:8080', protocol: 'tcp', length: 321},
+    {id: 'network02', timestamp: DateTime.now().minus({seconds: 987}).toMillis(), target: '10.0.0.12:447', source: '132.199.123.1:8080', protocol: 'tcp', length: 321},
+    {id: 'network03', timestamp: DateTime.now().minus({seconds: 564}).toMillis(), target: '10.0.0.12:447', source: '132.199.123.1:8080', protocol: 'tcp', length: 321},
+    {id: 'network04', timestamp: DateTime.now().minus({seconds: 64}).toMillis(), target: '132.199.123.1:8080', source: '10.0.0.12:447', protocol: 'tcp', length: 321},
+    {id: 'network05', timestamp: DateTime.now().minus({seconds: 431}).toMillis(), target: '10.0.0.12:80', source: '132.199.123.1:557', protocol: 'udp', length: 321},
+    {id: 'network06', timestamp: DateTime.now().minus({seconds: 24}).toMillis(), target: '132.199.123.1:557', source: '10.0.0.12:80', protocol: 'udp', length: 321},
+    {id: 'network07', timestamp: DateTime.now().minus({seconds: 468}).toMillis(), target: '10.0.0.12:447', source: '10.0.0.12:81', protocol: 'tcp', length: 321},
+    {id: 'network08', timestamp: DateTime.now().minus({seconds: 335}).toMillis(), target: '10.0.0.12:81', source: '10.0.0.12:447', protocol: 'tcp', length: 321},
+    {id: 'network09', timestamp: DateTime.now().minus({seconds: 231}).toMillis(), target: '10.0.0.12:447', source: '10.0.0.12:81', protocol: 'tcp', length: 321},
+    {id: 'network10', timestamp: DateTime.now().minus({seconds: 178}).toMillis(), target: '10.0.0.12:81', source: '10.0.0.12:447', protocol: 'tcp', length: 321},
+    {id: 'network11', timestamp: DateTime.now().minus({seconds: 45}).toMillis(), target: '132.199.123.1:8080', source: '10.0.0.12:447', protocol: 'tcp', length: 321},
+    {id: 'network12', timestamp: DateTime.now().minus({seconds: 30}).toMillis(), target: '132.199.123.1:8080', source: '10.0.0.12:447', protocol: 'tcp', length: 321},
 ];

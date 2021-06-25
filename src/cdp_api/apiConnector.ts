@@ -65,19 +65,18 @@ export class CdpApiConnector {
     }
 
     private parseFile(item: any): File {
-        const file = new File(item.path, item.name, item.type);
+        const file = new File(item.path, item.name, item.name.split('.')[item.name.split('.').length -1]);
         file.id = item.path;
         this.files.set(file.id, file);
         return file;
     }
 
     private parseFileVersion(item: any, file: File): void {
-        // console.log(this.fsmon);
-        const fsmonElement = this.fsmon.find((d: IFsmon) => (d.name === file.path) && (d.mtime === item.mtime));
+        const fsmonElement = this.fsmon.find((d: IFsmon) => (d.name === file.path) /*&& (d.mtime === item.mtime)*/);
         const fileVersion: FileVersion = new FileVersion(
             item.mtime * 1000,
             file.id,
-            fsmonElement ? fsmonElement.pid.toString() : 'n/a',
+            fsmonElement ? fsmonElement.pid.toString() : '0',
             item.fsize,
             'tbd'
         );
