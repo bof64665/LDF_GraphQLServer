@@ -7,7 +7,7 @@ This nodeJS-web server is part of a research prototype to provide visual decisio
 The prototype (together with the respective [client component](https://github.com/bof64665/LDF_ReactFrontend)) is intended for forensic experts that need to quickly decide which specialized forensic tools they should apply during a live forensic investigation. The web application includes several visualizations to facilitate this decision-making process.
 
 ## Components
-This repository includes a nodeJS web server exposing a GraphQL API which is used by the respective client of this research prototype. Through this web server, the client can retrieve the necessary information from a MongoDB and the specialized tool SauvegardeEx. Additionally, the repository holds a Python script which iteratively pre-processes the data from the connected MongoDB to meet the requirements of the frontend.
+This repository includes a nodeJS web server exposing a GraphQL API which is used by the respective client of this research prototype. Through this web server, the client can retrieve the necessary information from a MongoDB and the specialized tool [SauvegardeEx](github.com/LudwigEnglbrecht/sauvegardeEX). Additionally, the repository holds a Python script which iteratively pre-processes the data from the connected MongoDB to meet the requirements of the frontend.
 
 ## Available Scripts
 
