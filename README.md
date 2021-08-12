@@ -1,6 +1,6 @@
-# Visual Decision-Support for Live Digital Forensic Investigation - Server
+# Visual Decision-Support for Live Digital Forensics - Server
 
-This nodeJS-web server is part of a research prototype to provide visual decision-support for Live Digital Forensic investigations. A publication is currently being prepared and will be linked here once it is available.
+This nodeJS-web server is part of a research prototype to provide visual decision-support for Live Digital Forensic investigations. A publication is currently being prepared and will be linked here once it is available. A video of the prototype is available [here](https://youtu.be/vY-WYz3UYmw).
 
 ## Summary
 
